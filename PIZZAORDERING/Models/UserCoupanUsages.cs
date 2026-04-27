@@ -2,7 +2,7 @@ namespace PIZZAORDERING.Models;
 
 public class UserCoupanUsages
 {
-    public Guid UsageId { get; set; }
+    public Guid Id { get; set; }
 
     public Guid UserId { get; set; }
     

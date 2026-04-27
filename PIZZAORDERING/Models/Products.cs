@@ -10,6 +10,7 @@ public class Products
     public decimal Price { get; set; }
     public string ImageUrl { get; set; }
     public string PakaginInfo { get; set; }
+    public bool Veg { get; set; }
     public bool isAvailabel { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

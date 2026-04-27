@@ -1,5 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PIZZAORDERING.Data;
+using PIZZAORDERING.Dto;
+using PIZZAORDERING.Model;
+using PIZZAORDERING.Models;
 using PIZZAORDERING.Services;
 
 namespace PIZZAORDERING.Controllers;
@@ -17,7 +22,7 @@ namespace PIZZAORDERING.Controllers;
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
             var userifexsist =await _Db.Users.AnyAsync(u => u.Email == request.Email);
 
@@ -30,12 +35,15 @@ namespace PIZZAORDERING.Controllers;
 
             var user = new User
             {
-                Email = request.Email,
-                PasswordHash = passwordhash,
                 FullName = request.FullName,
-                Role = request.Role,
-                CreatedAt = request.CreatedAt,
-                Address = request.Address
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+                PasswordHash = passwordhash,
+                Address = request.Address,
+                LoyaltyPoints =0,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                Role = "User"
             };
 
             await _Db.Users.AddAsync(user);
@@ -44,7 +52,7 @@ namespace PIZZAORDERING.Controllers;
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
             var user = await _Db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
@@ -70,7 +78,7 @@ namespace PIZZAORDERING.Controllers;
             user.RefreshTokenExpiryTime = refreshexpriy;
             await _Db.SaveChangesAsync();
 
-            return Ok(new LoginResponce
+            return Ok(new AuthResponseDto
             {
                 Token = generatetoken,
                 RefreshToken = refreshtoken
@@ -79,7 +87,7 @@ namespace PIZZAORDERING.Controllers;
 
         [Authorize]
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto request)
         {
             var userdetail = await _Db.Users.FirstOrDefaultAsync(u =>
                 u.RefreshToken == request.RefreshToken);
@@ -103,7 +111,7 @@ namespace PIZZAORDERING.Controllers;
             userdetail.RefreshTokenExpiryTime = refreshtime;
             await _Db.SaveChangesAsync();
 
-            return Ok(new LoginResponce
+            return Ok(new AuthResponseDto
             {
                 Token = newtoken,
                 RefreshToken = refresh
@@ -112,7 +120,7 @@ namespace PIZZAORDERING.Controllers;
 
         [Authorize]
         [HttpPost("logout")]
-        public async Task<IActionResult> logout([FromBody] RefreshRequest request)
+        public async Task<IActionResult> logout([FromBody] RefreshRequestDto request)
         {
             var userdetail = await _Db.Users.FirstOrDefaultAsync(u =>
         
@@ -130,5 +138,25 @@ namespace PIZZAORDERING.Controllers;
             await _Db.SaveChangesAsync();
 
             return Ok(new { message = "logout success" });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("getusers")]
+        public async Task<IActionResult> getuser()
+        {
+            var list = await _Db.Users.ToListAsync();
+            var result = new List<UpdateProfileDto>();
+            foreach (var n in list)
+            {
+                var now = new UpdateProfileDto
+                {
+                    Fullname = n.FullName,
+                    PhoneNumber = n.PhoneNumber,
+                    Address = n.Address
+                };
+                result.Add(now);
+            }
+
+            return Ok(result);
         }
     }

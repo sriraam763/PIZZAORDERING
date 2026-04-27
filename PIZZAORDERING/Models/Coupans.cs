@@ -5,7 +5,7 @@ namespace PIZZAORDERING.Models;
 
 public class Coupans
 {
-    public Guid CouponId { get; set; }
+    public Guid Id { get; set; }
 
     public string Code { get; set; }
 

@@ -2,7 +2,7 @@ namespace PIZZAORDERING.Models;
 
 public class LoyaltyTransaction
 {
-    public Guid TransactionId { get; set; }
+    public Guid Id { get; set; }
 
     public Guid UserId { get; set; }
 
