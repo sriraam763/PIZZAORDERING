@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PIZZAORDERING.Data;
+using PIZZAORDERING.Dto;
 using PIZZAORDERING.Model;
 using PIZZAORDERING.Models;
 
@@ -181,4 +182,54 @@ public class BrowserController : Controller
     // {
     //     
     // }
+
+    [HttpPut("addcatorgories")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> addcato([FromBody] CreateCategoryDto request)
+    {
+        var cato = new ProductCatogries
+        {
+            Name = request.Name,
+            Description = request.Description,
+            ImageUrl = request.ImageUrl,
+            IsActive = true
+        };
+        return Ok(new { message = "created the catogory" });
+    }
+    
+    [HttpPut("addBrand")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> addbrand([FromBody] CreateBrandDto request)
+    {
+        var cato = new ProductBrands
+        {
+            Name = request.Name,
+            LogoUrl = request.LogoUrl,
+            IsActive = true
+        };
+        return Ok(new { message = "created the brand" });
+    }
+    
+    [HttpPut("addCoupan")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> addCoupan([FromBody] CreateCouponDto request)
+    {
+        var cato = new Coupans
+        {
+            Code = request.Code,
+            Description = request.Description,
+            DiscountType = request.DiscountType,
+            DiscountValue = request.DiscountValue,
+            MinOrderAmount = request.MinOrderAmount,
+            MaxDiscountAmount = request.MaxOrderAmount,
+            UsageLimit = request.UsageLimit,
+            UsageCount = 0,
+            PerUserLimit = request.PerUserLimit,
+            StartsAt = request.StartsAt,
+            ExpiresAt = request.ExpiresAt,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        };
+        return Ok(new { message = "created the Coupan" });
+    }
 }
